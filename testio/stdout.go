@@ -1,4 +1,4 @@
-package pipe
+package testio
 
 import (
 	"bufio"
@@ -17,38 +17,29 @@ type StdoutPipe struct {
 	scanner *bufio.Scanner
 }
 
-// Create a new StdoutPipe. Note: the old stdout is cached at create time, not when opened.
-func Stdout() StdoutPipe {
-	return StdoutPipe{
+// Create a new StdoutPipe. After calling, stdout will write output to the pipe until Restore is called.
+func OpenStdoutPipe() StdoutPipe {
+	p := StdoutPipe{
 		stdout: os.Stdout,
 	}
-}
-
-// Start capturing output from stdout.
-//
-// Returns a copy of the pipe to enable function chaining.
-func (p *StdoutPipe) Open() StdoutPipe {
 	p.out, p.in, _ = os.Pipe()
 
 	os.Stdout = p.in
 	p.scanner = bufio.NewScanner(p.out)
-
-	return *p
+	return p
 }
 
-// Close the input and restore stdout.
-// The pipe can still be read from, but will no longer be written to.
+// Close the input. The pipe can still be read from, but will no longer be written to.
 //
-// Note: closing the input before reading may be required to avoid some errors.
+// Should be called before reading to avoid unexpected program stalls.
 func (p StdoutPipe) CloseInput() {
-	os.Stdout = p.stdout
 	p.in.Close()
 }
 
-// Close the pipe and restore the cached stdout.
-// The pipe can no longer be written to or read from.
-func (p StdoutPipe) Close() {
-	p.CloseInput()
+// Close the pipe and restore stdout. The pipe can no longer be written to or read from.
+func (p StdoutPipe) Restore() {
+	os.Stdout = p.stdout
+	p.in.Close()
 	p.out.Close()
 }
 
