@@ -7,32 +7,37 @@ import (
 // StdinPipe is a test helper for inputting stdin.
 // The primary use case is to submit program input typically collected from the console.
 type StdinPipe struct {
-	stdin *os.File
-	out   *os.File
-	in    *os.File
+	stdin  *os.File
+	buffer chan any
 }
 
 // Create a new StdinPipe. After calling, stdin will read input from the pipe until Restore is called.
 //
-// To prevent program stalling, all input should be submitted to the pipe before it is needed.
-func OpenStdinPipe() StdinPipe {
+// 'bufSize' defines the size of the input buffer. Ensure the size is large enough to prevent stalling.
+func OpenStdinPipe(bufSize int) StdinPipe {
 	p := StdinPipe{
-		stdin: os.Stdin,
+		stdin:  os.Stdin,
+		buffer: make(chan any, bufSize),
 	}
-	p.out, p.in, _ = os.Pipe()
+	os.Stdin, input, _ = os.Pipe()
 
-	os.Stdin = p.out
+	go run(p.buffer)
+
 	return p
 }
 
 // Close the pipe and restore stdin. The pipe can no longer be read from or written to.
 func (p StdinPipe) Restore() {
+	os.Stdin.Close()
+	input.Close()
+
 	os.Stdin = p.stdin
-	p.out.Close()
-	p.in.Close()
+	input = nil
 }
 
-// Submit input to the pipe. Should only be called once per test.
+// Submit new input to the buffer. If the buffer is full, the execution will stall until room is made.
 func (p StdinPipe) Submit(input ...any) {
-	go queueInput(p.in, input)
+	for _, val := range input {
+		p.buffer <- val
+	}
 }

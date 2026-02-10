@@ -2,18 +2,25 @@ package testio
 
 import (
 	"fmt"
-	"os"
+	"io"
 )
 
 var signal = make(chan struct{})
+var input io.WriteCloser
 
+// Notify the go routine to queue the next input.
+// Should be called right before reading from stdin.
+//
+// If the StdinPipe is not open, this function does nothing.
 func Notify() {
-	signal <- struct{}{}
+	if input != nil {
+		signal <- struct{}{}
+	}
 }
 
-func queueInput(in *os.File, input []any) {
-	for _, line := range input {
+func run(buffer chan any) {
+	for {
 		<-signal
-		fmt.Fprintln(in, line)
+		fmt.Fprintln(input, <-buffer)
 	}
 }
