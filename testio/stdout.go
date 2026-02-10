@@ -17,7 +17,7 @@ type StdoutPipe struct {
 	scanner *bufio.Scanner
 }
 
-// Create a new StdoutPipe. After calling, stdout will write output to the pipe until Restore is called.
+// Create a new StdoutPipe. After calling, stdout will write output to the pipe until Close is called.
 func OpenStdoutPipe() StdoutPipe {
 	p := StdoutPipe{
 		stdout: os.Stdout,
@@ -37,7 +37,7 @@ func (p StdoutPipe) CloseInput() {
 }
 
 // Close the pipe and restore stdout. The pipe can no longer be written to or read from.
-func (p StdoutPipe) Restore() {
+func (p StdoutPipe) Close() {
 	os.Stdout = p.stdout
 	p.in.Close()
 	p.out.Close()
