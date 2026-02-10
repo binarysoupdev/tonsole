@@ -22,7 +22,6 @@ func OpenStdinPipe(bufSize int) StdinPipe {
 	os.Stdin, input, _ = os.Pipe()
 
 	go run(p.buffer)
-
 	return p
 }
 

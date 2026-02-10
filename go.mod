@@ -1,4 +1,4 @@
-module github.com/binarysoupdev/tonsole
+module github.com/binarysoupdev/tinsel
 
 go 1.25
 
