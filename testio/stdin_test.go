@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStdinPipe(t *testing.T) {
+func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(64)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
@@ -27,5 +27,25 @@ func TestStdinPipe(t *testing.T) {
 
 		//-- assert
 		assert.Equal(t, INPUT[i], res[:len(res)-1])
+	}
+}
+
+func TestStdinPipeSubmitMany(t *testing.T) {
+	//-- arrange
+	r := rand.New(64)
+	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
+
+	in := testio.OpenStdinPipe(len(INPUT))
+	defer in.Close()
+
+	for _, input := range INPUT {
+		//-- act
+		in.Submit(input)
+
+		testio.Notify()
+		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+
+		//-- assert
+		assert.Equal(t, input, res[:len(res)-1])
 	}
 }

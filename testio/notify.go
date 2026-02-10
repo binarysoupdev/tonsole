@@ -1,11 +1,6 @@
 package testio
 
-import (
-	"io"
-)
-
 var signal = make(chan struct{})
-var input io.WriteCloser
 
 // Notify the go routine to queue the next input.
 // Should be called right before reading from stdin.
