@@ -20,10 +20,9 @@ func TestStdoutPipe(t *testing.T) {
 
 	//-- act
 	fmt.Println(strings.Join(OUTPUT, "\n"))
-	out.CloseInput()
 
 	for i := range OUTPUT {
 		//-- assert
-		assert.Equal(t, OUTPUT[i], out.NextLine(t))
+		assert.Equal(t, OUTPUT[i], out.NextLine())
 	}
 }
