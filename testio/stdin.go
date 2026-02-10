@@ -1,6 +1,7 @@
 package testio
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -11,7 +12,7 @@ type StdinPipe struct {
 	buffer chan any
 }
 
-// Create a new StdinPipe. After calling, stdin will read input from the pipe until Restore is called.
+// Create a new StdinPipe. After calling, stdin will read input from the pipe until Close is called.
 //
 // 'bufSize' defines the size of the input buffer. Ensure the size is large enough to prevent stalling.
 func OpenStdinPipe(bufSize int) StdinPipe {
@@ -21,12 +22,12 @@ func OpenStdinPipe(bufSize int) StdinPipe {
 	}
 	os.Stdin, input, _ = os.Pipe()
 
-	go run(p.buffer)
+	go p.run()
 	return p
 }
 
 // Close the pipe and restore stdin. The pipe can no longer be read from or written to.
-func (p StdinPipe) Restore() {
+func (p StdinPipe) Close() {
 	os.Stdin.Close()
 	input.Close()
 
@@ -38,5 +39,12 @@ func (p StdinPipe) Restore() {
 func (p StdinPipe) Submit(input ...any) {
 	for _, val := range input {
 		p.buffer <- val
+	}
+}
+
+func (p StdinPipe) run() {
+	for {
+		<-signal
+		fmt.Fprintln(input, <-p.buffer)
 	}
 }

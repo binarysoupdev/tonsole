@@ -1,7 +1,6 @@
 package testio
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -15,12 +14,5 @@ var input io.WriteCloser
 func Notify() {
 	if input != nil {
 		signal <- struct{}{}
-	}
-}
-
-func run(buffer chan any) {
-	for {
-		<-signal
-		fmt.Fprintln(input, <-buffer)
 	}
 }
