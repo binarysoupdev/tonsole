@@ -35,7 +35,7 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 	r := rand.New(64)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
-	in := tinsel.OpenStdinPipe(len(INPUT))
+	in := tinsel.OpenStdinPipe(1)
 	defer in.Close()
 
 	for _, input := range INPUT {
