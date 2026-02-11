@@ -1,4 +1,4 @@
-package testio
+package tinsel
 
 import (
 	"fmt"

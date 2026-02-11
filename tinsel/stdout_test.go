@@ -1,4 +1,4 @@
-package testio_test
+package tinsel_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/binarysoupdev/tinsel/rand"
-	"github.com/binarysoupdev/tinsel/testio"
+	"github.com/binarysoupdev/tinsel/tinsel"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func TestStdoutPipePrintOnce(t *testing.T) {
 	r := rand.New(64)
 	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
-	out := testio.OpenStdoutPipe()
+	out := tinsel.OpenStdoutPipe()
 	defer out.Close()
 
 	//-- act
@@ -33,7 +33,7 @@ func TestStdoutPipePrintMany(t *testing.T) {
 	r := rand.New(64)
 	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
-	out := testio.OpenStdoutPipe()
+	out := tinsel.OpenStdoutPipe()
 	defer out.Close()
 
 	for _, output := range OUTPUT {

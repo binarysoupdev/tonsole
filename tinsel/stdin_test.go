@@ -1,4 +1,4 @@
-package testio_test
+package tinsel_test
 
 import (
 	"bufio"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/binarysoupdev/tinsel/rand"
-	"github.com/binarysoupdev/tinsel/testio"
+	"github.com/binarysoupdev/tinsel/tinsel"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,14 +15,14 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 	r := rand.New(64)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
-	in := testio.OpenStdinPipe(len(INPUT))
+	in := tinsel.OpenStdinPipe(len(INPUT))
 	defer in.Close()
 
 	//-- act
 	in.Submit(INPUT...)
 
 	for i := range INPUT {
-		testio.Notify()
+		tinsel.QueueInput()
 		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 
 		//-- assert
@@ -35,14 +35,14 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 	r := rand.New(64)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
-	in := testio.OpenStdinPipe(len(INPUT))
+	in := tinsel.OpenStdinPipe(len(INPUT))
 	defer in.Close()
 
 	for _, input := range INPUT {
 		//-- act
 		in.Submit(input)
 
-		testio.Notify()
+		tinsel.QueueInput()
 		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 
 		//-- assert
