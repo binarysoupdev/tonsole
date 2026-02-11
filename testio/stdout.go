@@ -9,20 +9,19 @@ import (
 // StdoutPipe is a test helper for capturing stdout.
 // The primary use case is to test program output typically printed to the console.
 type StdoutPipe struct {
-	stdout *os.File
-	output io.ReadCloser
-	buffer chan string
+	stdout  *os.File
+	output  io.ReadCloser
+	scanner *bufio.Scanner
 }
 
 // Create a new StdoutPipe. After calling, stdout will write output to the pipe until Close is called.
 func OpenStdoutPipe() StdoutPipe {
 	p := StdoutPipe{
 		stdout: os.Stdout,
-		buffer: make(chan string),
 	}
 	p.output, os.Stdout, _ = os.Pipe()
 
-	go p.run()
+	p.scanner = bufio.NewScanner(p.output)
 	return p
 }
 
@@ -34,15 +33,17 @@ func (p StdoutPipe) Close() {
 	os.Stdout = p.stdout
 }
 
-// Read the next line in the pipe. If there are no more lines, the execution stalls until output is available.
-func (p StdoutPipe) NextLine() string {
-	return <-p.buffer
+// Read from the pipe until a newline is encountered.
+// If there are no newlines in the pipe, the program stalls until one is written (see EndLine).
+func (p StdoutPipe) ReadLine() string {
+	if p.scanner.Scan() {
+		return p.scanner.Text()
+	} else {
+		panic("stdout pipe is closed")
+	}
 }
 
-func (p StdoutPipe) run() {
-	scanner := bufio.NewScanner(p.output)
-
-	for scanner.Scan() {
-		p.buffer <- scanner.Text()
-	}
+// Write a newline character to the pipe. May be needed if the code being tested doesn't write its own.
+func (p StdoutPipe) EndLine() {
+	os.Stdout.Write([]byte{'\n'})
 }

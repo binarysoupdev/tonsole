@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStdoutPipe(t *testing.T) {
+func TestStdoutPipePrintOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(64)
 	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
@@ -19,10 +19,28 @@ func TestStdoutPipe(t *testing.T) {
 	defer out.Close()
 
 	//-- act
-	fmt.Println(strings.Join(OUTPUT, "\n"))
+	fmt.Print(strings.Join(OUTPUT, "\n"))
+	out.EndLine()
 
 	for i := range OUTPUT {
 		//-- assert
-		assert.Equal(t, OUTPUT[i], out.NextLine())
+		assert.Equal(t, OUTPUT[i], out.ReadLine())
+	}
+}
+
+func TestStdoutPipePrintMany(t *testing.T) {
+	//-- arrange
+	r := rand.New(64)
+	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
+
+	out := testio.OpenStdoutPipe()
+	defer out.Close()
+
+	for _, output := range OUTPUT {
+		//-- act
+		fmt.Println(output)
+
+		//-- assert
+		assert.Equal(t, output, out.ReadLine())
 	}
 }
