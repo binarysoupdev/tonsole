@@ -13,7 +13,7 @@ import (
 
 func TestCreateFile(t *testing.T) {
 	//-- arrange
-	r := rand.New(64)
+	r := rand.New(1)
 	FILE := fmt.Sprintf("%s.%s", r.ASCII(10), r.ASCII(3))
 
 	//-- act

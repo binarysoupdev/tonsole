@@ -12,7 +12,7 @@ import (
 
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
-	r := rand.New(64)
+	r := rand.New(1)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	in := tinsel.OpenStdinPipe(len(INPUT))
@@ -32,7 +32,7 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 
 func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
-	r := rand.New(64)
+	r := rand.New(2)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	in := tinsel.OpenStdinPipe(1)
