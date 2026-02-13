@@ -12,7 +12,7 @@ import (
 
 func TestStdoutPipePrintOnce(t *testing.T) {
 	//-- arrange
-	r := rand.New(1)
+	r := rand.New(SEED)
 	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	out := tinsel.OpenStdoutPipe()
@@ -30,7 +30,7 @@ func TestStdoutPipePrintOnce(t *testing.T) {
 
 func TestStdoutPipePrintMany(t *testing.T) {
 	//-- arrange
-	r := rand.New(2)
+	r := rand.New(SEED)
 	OUTPUT := []string{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	out := tinsel.OpenStdoutPipe()

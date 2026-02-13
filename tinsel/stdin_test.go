@@ -10,9 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const SEED = 64
+
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
-	r := rand.New(1)
+	r := rand.New(SEED)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	in := tinsel.OpenStdinPipe(len(INPUT))
@@ -32,7 +34,7 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 
 func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
-	r := rand.New(2)
+	r := rand.New(SEED)
 	INPUT := []any{r.ASCII(10), r.ASCII(10), r.ASCII(10)}
 
 	in := tinsel.OpenStdinPipe(1)

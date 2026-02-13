@@ -11,9 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const SEED = 64
+
 func TestCreateFile(t *testing.T) {
 	//-- arrange
-	r := rand.New(1)
+	r := rand.New(SEED)
 	FILE := fmt.Sprintf("%s.%s", r.ASCII(10), r.ASCII(3))
 
 	//-- act
