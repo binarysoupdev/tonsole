@@ -21,9 +21,11 @@ func TestStdoutPipePrintOnce(t *testing.T) {
 	//-- act
 	fmt.Println(strings.Join(OUTPUT, "\n"))
 
-	for i := range OUTPUT {
-		//-- assert
-		assert.Equal(t, OUTPUT[i], out.ReadLine())
+	//-- assert
+	lines := out.ReadLines(len(OUTPUT))
+
+	for i, line := range lines {
+		assert.Equal(t, OUTPUT[i], line)
 	}
 }
 

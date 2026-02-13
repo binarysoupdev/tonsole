@@ -34,11 +34,24 @@ func (p StdoutPipe) Close() {
 }
 
 // Read from the pipe until a newline is encountered.
-// If there are no newlines in the pipe, the program stalls until one is written (see EndLine).
+//
+// If there are no more newlines in the pipe, the program stalls until one is written.
 func (p StdoutPipe) ReadLine() string {
 	if p.scanner.Scan() {
 		return p.scanner.Text()
 	} else {
 		panic("stdout pipe is closed")
 	}
+}
+
+// Read 'n' lines from the pipe and return as a slice. Lines are separated by the newline character.
+//
+// If there are no more newlines in the pipe, the program stalls until one is written.
+func (p StdoutPipe) ReadLines(n int) []string {
+	lines := make([]string, n)
+
+	for i := range lines {
+		lines[i] = p.ReadLine()
+	}
+	return lines
 }
