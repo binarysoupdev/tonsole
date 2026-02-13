@@ -42,8 +42,3 @@ func (p StdoutPipe) ReadLine() string {
 		panic("stdout pipe is closed")
 	}
 }
-
-// Write a newline character to the pipe. May be needed if the code being tested doesn't write its own.
-func (p StdoutPipe) EndLine() {
-	os.Stdout.Write([]byte{'\n'})
-}

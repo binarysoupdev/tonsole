@@ -19,8 +19,7 @@ func TestStdoutPipePrintOnce(t *testing.T) {
 	defer out.Close()
 
 	//-- act
-	fmt.Print(strings.Join(OUTPUT, "\n"))
-	out.EndLine()
+	fmt.Println(strings.Join(OUTPUT, "\n"))
 
 	for i := range OUTPUT {
 		//-- assert

@@ -24,7 +24,7 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 	in.Submit(INPUT...)
 
 	for i := range INPUT {
-		tinsel.QueueInput()
+		tinsel.QueueInput(false)
 		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 
 		//-- assert
@@ -44,7 +44,7 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 		//-- act
 		in.Submit(input)
 
-		tinsel.QueueInput()
+		tinsel.QueueInput(false)
 		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 
 		//-- assert
