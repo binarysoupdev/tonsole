@@ -32,7 +32,7 @@ func (p IOPipe) inputLoop() {
 
 	for len(p.inputClosed) == 0 || len(p.inBuffer) > 0 {
 		select {
-		case <-p.cancel:
+		case <-p.close:
 			return
 		case pair := <-p.inBuffer:
 			p.inputOnPrompt(pair.Prompt, pair.Value)
