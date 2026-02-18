@@ -18,9 +18,11 @@ type IOPipe struct {
 	outBuffer   chan string
 	inputClosed chan struct{}
 	cancel      chan struct{}
+
+	echo bool
 }
 
-func OpenStdio(inputBuf, outputBuf int) IOPipe {
+func OpenStdio(inputBuf, outputBuf int, echo bool) IOPipe {
 	p := IOPipe{
 		stdin:       os.Stdin,
 		stdout:      os.Stdout,
@@ -28,6 +30,7 @@ func OpenStdio(inputBuf, outputBuf int) IOPipe {
 		outBuffer:   nil,
 		inputClosed: make(chan struct{}, 1),
 		cancel:      make(chan struct{}, 1),
+		echo:        echo,
 	}
 
 	os.Stdin, p.input, _ = os.Pipe()

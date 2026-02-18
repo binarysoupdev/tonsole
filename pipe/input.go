@@ -11,7 +11,7 @@ type InputPair struct {
 }
 
 func OpenStdin(bufSize int) IOPipe {
-	return OpenStdio(bufSize, 0)
+	return OpenStdio(bufSize, 0, false)
 }
 
 func (p IOPipe) Submit(pairs ...InputPair) {
@@ -36,8 +36,7 @@ func (p IOPipe) inputLoop() {
 		case <-p.cancel:
 			return
 		case pair := <-p.inBuffer:
-			p.waitPrompt([]byte(pair.Prompt))
-			fmt.Fprintln(p.input, pair.Value)
+			p.inputOnPrompt(pair.Prompt, pair.Value)
 		}
 
 		if len(p.inputClosed) > 0 {
@@ -51,16 +50,27 @@ func (p IOPipe) inputLoop() {
 	}
 }
 
-func (p IOPipe) waitPrompt(prompt []byte) {
-	buffer := make([]byte, len(prompt))
+func (p IOPipe) inputOnPrompt(prompt string, val any) {
 	output := ""
+	p.waitPrompt([]byte(prompt), &output)
 
+	if p.echo {
+		p.captureOutput(&output, fmt.Sprintf("%v\n", val))
+	} else {
+		p.captureOutput(&output, "\n")
+	}
+
+	fmt.Fprintln(p.input, val)
+}
+
+func (p IOPipe) waitPrompt(prompt []byte, output *string) {
+	buffer := make([]byte, len(prompt))
 	slice := buffer[:]
 	index := 0
 
 	for {
 		p.output.Read(slice)
-		p.captureOutput(&output, string(slice))
+		p.captureOutput(output, string(slice))
 
 		for _, char := range slice {
 			if char == prompt[index] {
@@ -71,10 +81,8 @@ func (p IOPipe) waitPrompt(prompt []byte) {
 		}
 
 		if index == len(prompt) {
-			p.captureOutput(&output, "\n")
 			return
 		}
-
 		slice = buffer[:len(prompt)-index]
 	}
 }

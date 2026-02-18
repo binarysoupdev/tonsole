@@ -1,7 +1,7 @@
 package pipe
 
 func OpenStdout(bufSize int) IOPipe {
-	return OpenStdio(0, bufSize)
+	return OpenStdio(0, bufSize, false)
 }
 
 func (p IOPipe) ReadLine() string {
