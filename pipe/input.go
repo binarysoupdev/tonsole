@@ -29,23 +29,13 @@ func (p IOPipe) inputLoop() {
 	if p.inBuffer == nil {
 		return
 	}
-	closed := false
 
-	for {
+	for len(p.inputClosed) == 0 || len(p.inBuffer) > 0 {
 		select {
 		case <-p.cancel:
 			return
 		case pair := <-p.inBuffer:
 			p.inputOnPrompt(pair.Prompt, pair.Value)
-		}
-
-		if len(p.inputClosed) > 0 {
-			<-p.inputClosed
-			closed = true
-		}
-
-		if closed && len(p.inBuffer) == 0 {
-			return
 		}
 	}
 }
