@@ -22,25 +22,35 @@ func (p IOPipe) Submit(pairs ...InputPair) {
 
 func (p IOPipe) SubmitFinal(pairs ...InputPair) {
 	p.Submit(pairs...)
-	p.inputClosed = true
+	p.inputClosed <- struct{}{}
 }
 
 func (p IOPipe) inputLoop() {
 	if p.inBuffer == nil {
 		return
 	}
+	closed := false
 
-	for len(p.inBuffer) > 0 || !p.inputClosed {
+	for {
 		select {
 		case <-p.cancel:
 			return
 		case pair := <-p.inBuffer:
-			p.queueInput(pair)
+			p.inputOnPrompt(pair.Prompt, pair.Value)
+		}
+
+		if len(p.inputClosed) > 0 {
+			<-p.inputClosed
+			closed = true
+		}
+
+		if closed && len(p.inBuffer) == 0 {
+			return
 		}
 	}
 }
 
-func (p IOPipe) queueInput(pair InputPair) {
+func (p IOPipe) inputOnPrompt(prompt string, val any) {
 	for p.scanner.Scan() {
 		text := p.scanner.Text()
 
@@ -48,8 +58,8 @@ func (p IOPipe) queueInput(pair InputPair) {
 			p.outBuffer <- text
 		}
 
-		if strings.Contains(text, pair.Prompt) {
-			fmt.Fprintln(p.input, pair.Value)
+		if strings.Contains(text, prompt) {
+			fmt.Fprintln(p.input, val)
 			return
 		}
 	}

@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const SEED = 42
-
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)

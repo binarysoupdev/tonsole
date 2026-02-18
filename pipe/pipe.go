@@ -14,11 +14,10 @@ type IOPipe struct {
 	output  io.ReadCloser
 	scanner *bufio.Scanner
 
-	inBuffer  chan InputPair
-	outBuffer chan string
-	cancel    chan struct{}
-
-	inputClosed bool
+	inBuffer    chan InputPair
+	outBuffer   chan string
+	inputClosed chan struct{}
+	cancel      chan struct{}
 }
 
 func OpenStdio(inputBuf, outputBuf int) IOPipe {
@@ -27,8 +26,8 @@ func OpenStdio(inputBuf, outputBuf int) IOPipe {
 		stdout:      os.Stdout,
 		inBuffer:    nil,
 		outBuffer:   nil,
+		inputClosed: make(chan struct{}, 1),
 		cancel:      make(chan struct{}, 1),
-		inputClosed: false,
 	}
 
 	os.Stdin, p.input, _ = os.Pipe()
