@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"bufio"
 	"io"
 	"os"
 )
@@ -10,9 +9,8 @@ type IOPipe struct {
 	stdin  *os.File
 	stdout *os.File
 
-	input   io.WriteCloser
-	output  io.ReadCloser
-	scanner *bufio.Scanner
+	input  io.WriteCloser
+	output io.ReadCloser
 
 	inBuffer    chan InputPair
 	outBuffer   chan string
@@ -35,7 +33,6 @@ func OpenStdio(inputBuf, outputBuf int, echo bool) IOPipe {
 
 	os.Stdin, p.input, _ = os.Pipe()
 	p.output, os.Stdout, _ = os.Pipe()
-	p.scanner = bufio.NewScanner(p.output)
 
 	if inputBuf > 0 {
 		p.inBuffer = make(chan InputPair, inputBuf)

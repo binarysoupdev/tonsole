@@ -1,5 +1,7 @@
 package pipe
 
+import "bufio"
+
 func OpenStdout(bufSize int) IOPipe {
 	return OpenStdio(0, bufSize, false)
 }
@@ -21,8 +23,9 @@ func (p IOPipe) outputLoop() {
 	if p.outBuffer == nil {
 		return
 	}
+	scanner := bufio.NewScanner(p.output)
 
-	for p.scanner.Scan() {
-		p.outBuffer <- p.scanner.Text()
+	for scanner.Scan() {
+		p.outBuffer <- scanner.Text()
 	}
 }
