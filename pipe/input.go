@@ -36,7 +36,8 @@ func (p IOPipe) inputLoop() {
 		case <-p.cancel:
 			return
 		case pair := <-p.inBuffer:
-			p.inputOnPrompt(pair.Prompt, pair.Value)
+			p.waitPrompt([]byte(pair.Prompt))
+			fmt.Fprintln(p.input, pair.Value)
 		}
 
 		if len(p.inputClosed) > 0 {
@@ -50,17 +51,44 @@ func (p IOPipe) inputLoop() {
 	}
 }
 
-func (p IOPipe) inputOnPrompt(prompt string, val any) {
-	for p.scanner.Scan() {
-		text := p.scanner.Text()
+func (p IOPipe) waitPrompt(prompt []byte) {
+	buffer := make([]byte, len(prompt))
+	output := ""
 
-		if p.outBuffer != nil {
-			p.outBuffer <- text
+	slice := buffer[:]
+	index := 0
+
+	for {
+		p.output.Read(slice)
+		p.captureOutput(&output, string(slice))
+
+		for _, char := range slice {
+			if char == prompt[index] {
+				index++
+			} else {
+				index = 0
+			}
 		}
 
-		if strings.Contains(text, prompt) {
-			fmt.Fprintln(p.input, val)
+		if index == len(prompt) {
+			p.captureOutput(&output, "\n")
 			return
 		}
+
+		slice = buffer[:len(prompt)-index]
 	}
+}
+
+func (p IOPipe) captureOutput(output *string, str string) {
+	if p.outBuffer == nil {
+		return
+	}
+
+	*output += str
+	tokens := strings.Split(*output, "\n")
+
+	for i := range len(tokens) - 1 {
+		p.outBuffer <- tokens[i]
+	}
+	*output = tokens[len(tokens)-1]
 }

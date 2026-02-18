@@ -1,9 +1,7 @@
 package pipe_test
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/binarysoupdev/tinsel/pipe"
@@ -16,7 +14,7 @@ const SEED = 42
 func TestStdioPipeInputAndOutput(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
-	INPUT := pipe.InputPair{"prompt", r.ASCII(10)}
+	INPUT := pipe.InputPair{"prompt: ", r.ASCII(10)}
 	PRE_INPUT := r.ASCII(15)
 	POST_INPUT := r.ASCII(15)
 
@@ -28,13 +26,13 @@ func TestStdioPipeInputAndOutput(t *testing.T) {
 	//-- act
 	fmt.Println(PRE_INPUT)
 
-	fmt.Println(INPUT.Prompt + ": ")
-	res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	fmt.Print(INPUT.Prompt)
+	res := readStdin()
 
 	fmt.Println(POST_INPUT)
 
 	//-- assert
-	assert.Equal(t, INPUT.Value, res[:len(res)-1])
+	assert.Equal(t, INPUT.Value, res)
 
 	assert.Equal(t, PRE_INPUT, io.ReadLine())
 	assert.Contains(t, io.ReadLine(), INPUT.Prompt)

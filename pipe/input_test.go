@@ -11,10 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func readStdin() string {
+	res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	return res[:len(res)-1]
+}
+
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
-	INPUT := []pipe.InputPair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
+	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(len(INPUT))
 	defer in.Close()
@@ -23,18 +28,18 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 	in.Submit(INPUT...)
 
 	for _, input := range INPUT {
-		fmt.Println(input.Prompt + ": ")
-		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		fmt.Print(input.Prompt)
+		res := readStdin()
 
 		//-- assert
-		assert.Equal(t, input.Value, res[:len(res)-1])
+		assert.Equal(t, input.Value, res)
 	}
 }
 
 func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
-	INPUT := []pipe.InputPair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
+	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(1)
 	defer in.Close()
@@ -43,10 +48,32 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 		//-- act
 		in.Submit(input)
 
-		fmt.Println(input.Prompt + ": ")
-		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		fmt.Print(input.Prompt)
+		res := readStdin()
 
 		//-- assert
-		assert.Equal(t, input.Value, res[:len(res)-1])
+		assert.Equal(t, input.Value, res)
 	}
+}
+
+func TestStdinPipeReadPrompt(t *testing.T) {
+	//-- arrange
+	r := rand.New(SEED)
+	INPUT := pipe.InputPair{"prompt", r.ASCII(10)}
+
+	in := pipe.OpenStdin(1)
+	defer in.Close()
+
+	in.Submit(INPUT, INPUT)
+
+	//-- act
+	fmt.Print("---prompt")
+	res1 := readStdin()
+
+	fmt.Print("pro-pro-prompt")
+	res2 := readStdin()
+
+	//-- assert
+	assert.Equal(t, INPUT.Value, res1)
+	assert.Equal(t, INPUT.Value, res2)
 }
