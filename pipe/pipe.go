@@ -6,11 +6,6 @@ import (
 	"os"
 )
 
-type Pair struct {
-	Prompt string
-	Value  any
-}
-
 type IOPipe struct {
 	stdin  *os.File
 	stdout *os.File
@@ -19,7 +14,7 @@ type IOPipe struct {
 	output  io.ReadCloser
 	scanner *bufio.Scanner
 
-	inBuffer  chan Pair
+	inBuffer  chan InputPair
 	outBuffer chan string
 	cancel    chan struct{}
 
@@ -41,7 +36,7 @@ func OpenStdio(inputBuf, outputBuf int) IOPipe {
 	p.scanner = bufio.NewScanner(p.output)
 
 	if inputBuf > 0 {
-		p.inBuffer = make(chan Pair, inputBuf)
+		p.inBuffer = make(chan InputPair, inputBuf)
 	}
 
 	if outputBuf > 0 {

@@ -16,7 +16,7 @@ const SEED = 42
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
-	INPUT := []pipe.Pair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
+	INPUT := []pipe.InputPair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(len(INPUT))
 	defer in.Close()
@@ -36,7 +36,7 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
-	INPUT := []pipe.Pair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
+	INPUT := []pipe.InputPair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(1)
 	defer in.Close()
