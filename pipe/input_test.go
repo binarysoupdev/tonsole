@@ -13,16 +13,16 @@ import (
 
 const SEED = 42
 
-func TestStdioPipeSubmitOnce(t *testing.T) {
+func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
 	INPUT := []pipe.Pair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
 
-	io := pipe.OpenStdio(len(INPUT))
-	defer io.Close()
+	in := pipe.OpenStdin(len(INPUT))
+	defer in.Close()
 
 	//-- act
-	io.Submit(INPUT...)
+	in.Submit(INPUT...)
 
 	for _, input := range INPUT {
 		fmt.Println(input.Prompt + ": ")
@@ -33,17 +33,17 @@ func TestStdioPipeSubmitOnce(t *testing.T) {
 	}
 }
 
-func TestStdioPipeSubmitMany(t *testing.T) {
+func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
 	r := rand.New(SEED)
 	INPUT := []pipe.Pair{{"prompt1", r.ASCII(10)}, {"prompt2", r.ASCII(10)}, {"prompt3", r.ASCII(10)}}
 
-	io := pipe.OpenStdio(1)
-	defer io.Close()
+	in := pipe.OpenStdin(1)
+	defer in.Close()
 
 	for _, input := range INPUT {
 		//-- act
-		io.Submit(input)
+		in.Submit(input)
 
 		fmt.Println(input.Prompt + ": ")
 		res, _ := bufio.NewReader(os.Stdin).ReadString('\n')

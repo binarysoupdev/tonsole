@@ -2,10 +2,8 @@ package pipe
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
 type Pair struct {
@@ -21,21 +19,34 @@ type IOPipe struct {
 	output  io.ReadCloser
 	scanner *bufio.Scanner
 
-	buffer chan Pair
-	done   chan struct{}
+	inBuffer  chan Pair
+	outBuffer chan string
+	cancel    chan struct{}
+
+	inputClosed bool
 }
 
-func OpenStdio(bufSize int) IOPipe {
+func OpenStdio(inputBuf, outputBuf int) IOPipe {
 	p := IOPipe{
-		stdin:  os.Stdin,
-		stdout: os.Stdout,
-		buffer: make(chan Pair, bufSize),
-		done:   make(chan struct{}),
+		stdin:       os.Stdin,
+		stdout:      os.Stdout,
+		inBuffer:    nil,
+		outBuffer:   nil,
+		cancel:      make(chan struct{}, 1),
+		inputClosed: false,
 	}
 
 	os.Stdin, p.input, _ = os.Pipe()
 	p.output, os.Stdout, _ = os.Pipe()
 	p.scanner = bufio.NewScanner(p.output)
+
+	if inputBuf > 0 {
+		p.inBuffer = make(chan Pair, inputBuf)
+	}
+
+	if outputBuf > 0 {
+		p.outBuffer = make(chan string, outputBuf)
+	}
 
 	go p.run()
 	return p
@@ -51,31 +62,10 @@ func (p IOPipe) Close() {
 	os.Stdin = p.stdin
 	os.Stdout = p.stdout
 
-	p.done <- struct{}{}
-}
-
-func (p IOPipe) Submit(pairs ...Pair) {
-	for _, pair := range pairs {
-		p.buffer <- pair
-	}
+	p.cancel <- struct{}{}
 }
 
 func (p IOPipe) run() {
-	for {
-		select {
-		case <-p.done:
-			return
-		case pair := <-p.buffer:
-			p.queueInput(pair)
-		}
-	}
-}
-
-func (p IOPipe) queueInput(pair Pair) {
-	for p.scanner.Scan() {
-		if strings.Contains(p.scanner.Text(), pair.Prompt) {
-			fmt.Fprintln(p.input, pair.Value)
-			return
-		}
-	}
+	p.inputLoop()
+	p.outputLoop()
 }
