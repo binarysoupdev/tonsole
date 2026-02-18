@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type IOPipe struct {
+type StdioPipe struct {
 	stdin  *os.File
 	stdout *os.File
 
@@ -20,8 +20,8 @@ type IOPipe struct {
 	echo bool
 }
 
-func OpenStdio(inputBuf, outputBuf int, echo bool) IOPipe {
-	p := IOPipe{
+func OpenStdio(inputBuf, outputBuf int, echo bool) StdioPipe {
+	p := StdioPipe{
 		stdin:       os.Stdin,
 		stdout:      os.Stdout,
 		input:       nil,
@@ -46,7 +46,7 @@ func OpenStdio(inputBuf, outputBuf int, echo bool) IOPipe {
 	return p
 }
 
-func (p IOPipe) Close() {
+func (p StdioPipe) Close() {
 	if p.input != nil {
 		os.Stdin.Close()
 		p.input.Close()
@@ -61,7 +61,7 @@ func (p IOPipe) Close() {
 	p.close <- struct{}{}
 }
 
-func (p IOPipe) run() {
+func (p StdioPipe) run() {
 	p.inputLoop()
 	p.outputLoop()
 }

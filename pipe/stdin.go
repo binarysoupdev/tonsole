@@ -10,22 +10,22 @@ type InputPair struct {
 	Value  any
 }
 
-func OpenStdin(bufSize int) IOPipe {
+func OpenStdin(bufSize int) StdioPipe {
 	return OpenStdio(bufSize, 0, false)
 }
 
-func (p IOPipe) Submit(pairs ...InputPair) {
+func (p StdioPipe) Submit(pairs ...InputPair) {
 	for _, pair := range pairs {
 		p.inBuffer <- pair
 	}
 }
 
-func (p IOPipe) SubmitFinal(pairs ...InputPair) {
+func (p StdioPipe) SubmitFinal(pairs ...InputPair) {
 	p.Submit(pairs...)
 	p.inputClosed <- struct{}{}
 }
 
-func (p IOPipe) inputLoop() {
+func (p StdioPipe) inputLoop() {
 	if p.inBuffer == nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (p IOPipe) inputLoop() {
 	}
 }
 
-func (p IOPipe) inputOnPrompt(prompt string, val any) {
+func (p StdioPipe) inputOnPrompt(prompt string, val any) {
 	output := ""
 	p.waitPrompt([]byte(prompt), &output)
 
@@ -53,7 +53,7 @@ func (p IOPipe) inputOnPrompt(prompt string, val any) {
 	fmt.Fprintln(p.input, val)
 }
 
-func (p IOPipe) waitPrompt(prompt []byte, output *string) {
+func (p StdioPipe) waitPrompt(prompt []byte, output *string) {
 	buffer := make([]byte, len(prompt))
 	slice := buffer[:]
 	index := 0
@@ -77,7 +77,7 @@ func (p IOPipe) waitPrompt(prompt []byte, output *string) {
 	}
 }
 
-func (p IOPipe) captureOutput(output *string, str string) {
+func (p StdioPipe) captureOutput(output *string, str string) {
 	if p.outBuffer == nil {
 		return
 	}
