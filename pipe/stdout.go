@@ -13,8 +13,7 @@ func (p StdioPipe) ReadLine() string {
 	return <-p.outBuffer
 }
 
-// Read multiple lines at once from output buffer.
-// Blocks until enough lines are available.
+// Read multiple lines at once from output buffer (see ReadLine).
 func (p StdioPipe) ReadLines(count int) []string {
 	lines := make([]string, count)
 
@@ -22,6 +21,13 @@ func (p StdioPipe) ReadLines(count int) []string {
 		lines[i] = p.ReadLine()
 	}
 	return lines
+}
+
+// Read then discard multiple lines from output buffer (see ReadLine).
+func (p StdioPipe) SkipLines(count int) {
+	for range count {
+		_ = p.ReadLine()
+	}
 }
 
 func (p StdioPipe) outputLoop() {
