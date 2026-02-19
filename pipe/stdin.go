@@ -24,11 +24,9 @@ func (p StdioPipe) Queue(prompt string, input any) {
 	p.inBuffer <- inputPair{prompt, input}
 }
 
-// Queue the [prompt, input] pair to the buffer (see Queue),
-// then notify the pipe that no more input is expected.
-// Must be used to continue reading output after the final input.
-func (p StdioPipe) QueueFinal(prompt string, input any) {
-	p.Queue(prompt, input)
+// Notify the pipe that no more input is expected.
+// Must be called to continue reading output after the final input.
+func (p StdioPipe) EndQueue() {
 	p.inputClosed <- struct{}{}
 }
 
