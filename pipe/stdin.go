@@ -26,6 +26,8 @@ func (p StdioPipe) Queue(prompt string, input any) {
 
 // Notify the pipe that no more input is expected.
 // Must be called to continue reading output after the final input.
+//
+// Note: if only using StdinPipe, this step is optionally.
 func (p StdioPipe) EndQueue() {
 	p.inputClosed <- struct{}{}
 }
