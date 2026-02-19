@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const SEED = 42
-
 func TestStdioPipeInputAndOutput(t *testing.T) {
 	//-- arrange
+	const SEED = 42
 	r := rand.New(SEED)
+
 	INPUT := pipe.InputPair{"prompt: ", r.ASCII(10)}
 	PRE_INPUT := r.ASCII(15)
 	POST_INPUT := r.ASCII(15)
@@ -41,7 +41,9 @@ func TestStdioPipeInputAndOutput(t *testing.T) {
 
 func TestStdioPipeWithEcho(t *testing.T) {
 	//-- arrange
+	const SEED = 42
 	r := rand.New(SEED)
+
 	INPUT := pipe.InputPair{"prompt: ", r.ASCII(10)}
 
 	io := pipe.OpenStdio(1, 1, true)

@@ -21,7 +21,7 @@ func CreateEmpty(t *testing.T, path string) string {
 	return path
 }
 
-// Create a new file in a new test directory. Returns the open file pointer and the path.
+// Create a new file in a new test directory and return the open file pointer and its path.
 func Create(t *testing.T, path string) (*os.File, string) {
 	path = NewPath(t, path)
 

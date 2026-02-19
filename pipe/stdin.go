@@ -18,6 +18,9 @@ func OpenStdin(bufSize int) StdioPipe {
 
 // Queue the next input pair(s) in the buffer.
 // Stalls if the input buffer is full (ensure a larger enough buffer size).
+//
+// The pipe will read stdout until the prompt has been read exactly,
+// then the associated input will be written to stdin.
 func (p StdioPipe) Queue(pairs ...InputPair) {
 	for _, pair := range pairs {
 		p.inBuffer <- pair

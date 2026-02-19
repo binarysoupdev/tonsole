@@ -18,7 +18,9 @@ func readStdin() string {
 
 func TestStdinPipeSubmitOnce(t *testing.T) {
 	//-- arrange
+	const SEED = 42
 	r := rand.New(SEED)
+
 	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(len(INPUT))
@@ -38,7 +40,9 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 
 func TestStdinPipeSubmitMany(t *testing.T) {
 	//-- arrange
+	const SEED = 42
 	r := rand.New(SEED)
+
 	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
 
 	in := pipe.OpenStdin(1)
@@ -58,7 +62,9 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 
 func TestStdinPipeReadPrompt(t *testing.T) {
 	//-- arrange
+	const SEED = 42
 	r := rand.New(SEED)
+
 	INPUT := pipe.InputPair{"prompt", r.ASCII(10)}
 
 	in := pipe.OpenStdin(1)
