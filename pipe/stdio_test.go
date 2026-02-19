@@ -14,28 +14,30 @@ func TestStdioPipeInputAndOutput(t *testing.T) {
 	const SEED = 42
 	r := rand.New(SEED)
 
-	INPUT := pipe.InputPair{"prompt: ", r.ASCII(10)}
-	PRE_INPUT := r.ASCII(15)
-	POST_INPUT := r.ASCII(15)
+	PROMPT := r.ASCII(10)
+	INPUT := r.ASCII(15)
+
+	PRE_INPUT := r.ASCII(30)
+	POST_INPUT := r.ASCII(30)
 
 	io := pipe.OpenStdio(1, 3, false)
 	defer io.Close()
 
-	io.QueueFinal(INPUT)
+	io.QueueFinal(PROMPT, INPUT)
 
 	//-- act
 	fmt.Println(PRE_INPUT)
 
-	fmt.Print(INPUT.Prompt)
+	fmt.Print(PROMPT)
 	res := readStdin()
 
 	fmt.Println(POST_INPUT)
 
 	//-- assert
-	assert.Equal(t, INPUT.Value, res)
+	assert.Equal(t, INPUT, res)
 
 	assert.Equal(t, PRE_INPUT, io.ReadLine())
-	assert.Contains(t, io.ReadLine(), INPUT.Prompt)
+	assert.Contains(t, io.ReadLine(), PROMPT)
 	assert.Equal(t, POST_INPUT, io.ReadLine())
 }
 
@@ -44,18 +46,19 @@ func TestStdioPipeWithEcho(t *testing.T) {
 	const SEED = 42
 	r := rand.New(SEED)
 
-	INPUT := pipe.InputPair{"prompt: ", r.ASCII(10)}
+	PROMPT := r.ASCII(10)
+	INPUT := r.ASCII(15)
 
 	io := pipe.OpenStdio(1, 1, true)
 	defer io.Close()
 
-	io.QueueFinal(INPUT)
+	io.QueueFinal(PROMPT, INPUT)
 
 	//-- act
-	fmt.Print(INPUT.Prompt)
+	fmt.Print(PROMPT)
 	res := readStdin()
 
 	//-- assert
-	assert.Equal(t, INPUT.Value, res)
-	assert.Equal(t, fmt.Sprintf("%s%v", INPUT.Prompt, INPUT.Value), io.ReadLine())
+	assert.Equal(t, INPUT, res)
+	assert.Equal(t, fmt.Sprintf("%s%v", PROMPT, INPUT), io.ReadLine())
 }

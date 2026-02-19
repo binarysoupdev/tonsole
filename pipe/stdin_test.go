@@ -16,47 +16,51 @@ func readStdin() string {
 	return res[:len(res)-1]
 }
 
-func TestStdinPipeSubmitOnce(t *testing.T) {
+func TestStdinPipeQueueAll(t *testing.T) {
 	//-- arrange
 	const SEED = 42
 	r := rand.New(SEED)
 
-	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
+	PROMPT := r.ASCII(10)
+	INPUTS := []string{r.ASCII(15), r.ASCII(15), r.ASCII(15)}
 
-	in := pipe.OpenStdin(len(INPUT))
+	in := pipe.OpenStdin(len(INPUTS))
 	defer in.Close()
 
 	//-- act
-	in.Queue(INPUT...)
+	for _, input := range INPUTS {
+		in.Queue(PROMPT, input)
+	}
 
-	for _, input := range INPUT {
-		fmt.Print(input.Prompt)
+	for _, input := range INPUTS {
+		fmt.Print(PROMPT)
 		res := readStdin()
 
 		//-- assert
-		assert.Equal(t, input.Value, res)
+		assert.Equal(t, input, res)
 	}
 }
 
-func TestStdinPipeSubmitMany(t *testing.T) {
+func TestStdinPipeQueueOne(t *testing.T) {
 	//-- arrange
 	const SEED = 42
 	r := rand.New(SEED)
 
-	INPUT := []pipe.InputPair{{"prompt1: ", r.ASCII(10)}, {"prompt2: ", r.ASCII(10)}, {"prompt3: ", r.ASCII(10)}}
+	PROMPT := r.ASCII(10)
+	INPUTS := []string{r.ASCII(15), r.ASCII(15), r.ASCII(15)}
 
 	in := pipe.OpenStdin(1)
 	defer in.Close()
 
-	for _, input := range INPUT {
+	for _, input := range INPUTS {
 		//-- act
-		in.Queue(input)
+		in.Queue(PROMPT, input)
 
-		fmt.Print(input.Prompt)
+		fmt.Print(PROMPT)
 		res := readStdin()
 
 		//-- assert
-		assert.Equal(t, input.Value, res)
+		assert.Equal(t, input, res)
 	}
 }
 
@@ -65,21 +69,22 @@ func TestStdinPipeReadPrompt(t *testing.T) {
 	const SEED = 42
 	r := rand.New(SEED)
 
-	INPUT := pipe.InputPair{"prompt", r.ASCII(10)}
+	INPUT1 := r.ASCII(15)
+	INPUT2 := r.ASCII(15)
 
 	in := pipe.OpenStdin(1)
 	defer in.Close()
 
-	in.Queue(INPUT, INPUT)
-
 	//-- act
+	in.Queue("prompt", INPUT1)
 	fmt.Print("---prompt")
 	res1 := readStdin()
 
+	in.Queue("prompt", INPUT2)
 	fmt.Print("pro-pro-prompt")
 	res2 := readStdin()
 
 	//-- assert
-	assert.Equal(t, INPUT.Value, res1)
-	assert.Equal(t, INPUT.Value, res2)
+	assert.Equal(t, INPUT1, res1)
+	assert.Equal(t, INPUT2, res2)
 }

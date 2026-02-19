@@ -13,7 +13,7 @@ type StdioPipe struct {
 	input  io.WriteCloser
 	output io.ReadCloser
 
-	inBuffer    chan InputPair
+	inBuffer    chan inputPair
 	outBuffer   chan string
 	inputClosed chan struct{}
 	close       chan struct{}
@@ -44,7 +44,7 @@ func OpenStdio(inBufSize, outBufSize int, enableEcho bool) StdioPipe {
 
 	if inBufSize > 0 {
 		os.Stdin, p.input, _ = os.Pipe()
-		p.inBuffer = make(chan InputPair, inBufSize)
+		p.inBuffer = make(chan inputPair, inBufSize)
 	}
 
 	p.output, os.Stdout, _ = os.Pipe()

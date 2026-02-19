@@ -5,8 +5,7 @@ import (
 	"strings"
 )
 
-// Simple struct to group a prompt and value pair.
-type InputPair struct {
+type inputPair struct {
 	Prompt string
 	Value  any
 }
@@ -16,21 +15,20 @@ func OpenStdin(bufSize int) StdioPipe {
 	return OpenStdio(bufSize, 0, false)
 }
 
-// Queue the next input pair(s) in the buffer.
+// Queue the next [prompt, input] pair to the buffer.
 // Stalls if the input buffer is full (ensure a larger enough buffer size).
 //
 // The pipe will read stdout until the prompt has been read exactly,
 // then the associated input will be written to stdin.
-func (p StdioPipe) Queue(pairs ...InputPair) {
-	for _, pair := range pairs {
-		p.inBuffer <- pair
-	}
+func (p StdioPipe) Queue(prompt string, input any) {
+	p.inBuffer <- inputPair{prompt, input}
 }
 
-// Queue the input pair(s) in the buffer, if any, then notify the pipe that no more input is expected.
+// Queue the [prompt, input] pair to the buffer (see Queue),
+// then notify the pipe that no more input is expected.
 // Must be used to continue reading output after the final input.
-func (p StdioPipe) QueueFinal(pairs ...InputPair) {
-	p.Queue(pairs...)
+func (p StdioPipe) QueueFinal(prompt string, input any) {
+	p.Queue(prompt, input)
 	p.inputClosed <- struct{}{}
 }
 
