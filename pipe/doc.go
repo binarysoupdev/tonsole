@@ -1,27 +1,44 @@
 /*
-The pipe package provides the ability to input values to stdin and read output from stdout in automated test cases.
-The following example demonstrates a basic usage case for the pipe.
+The pipe package provides the StdioPipe for reading/writing from stdin/stdout in automated testing.
 
-	// create new prompt and input pair
-	PROMPT := "prompt: "
-	INPUT := "input"
+The create a new pipe, use the Open method with the desired buffer sizes.
 
-	// open the pipe with buffer sizes of 1 and echo enabled
+	// open pipe then defer close
 	io := pipe.OpenStdio(1, 1, true)
 	defer io.Close()
 
-	// queue the input and mark the input sequence as complete
-	io.Queue(INPUT)
+If only input or output is desired, use the appropriate open variant.
+
+	// stdin only
+	in := pipe.OpenStdin(1)
+	defer in.Close()
+
+	// stdout only
+	out := pipe.OpenStdout(1)
+	defer out.Close()
+
+To queue input for stdin, supply the input with the expected prompt using the Queue method.
+
+	// queue a [prompt, input] pair
+	in.Queue("prompt: ", INPUT)
+
+If using both input and output (ie. OpenStdio), then the queue sequence must be marked as complete.
+
+	// queue the pair then mark finished
+	io.Queue("prompt: ", INPUT)
 	io.EndQueue()
 
-	// write the prompt to stdout then read input from stdin
-	fmt.Print(PROMPT)
-	res, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+To read output from stdout (newline separated), use the ReadLine or ReadLines variant.
 
-	// (using testify) assert the result matches the input with newline stripped
-	assert.Equal(t, INPUT, res[:len(res)-1])
+	// read single line
+	line := out.ReadLine()
 
-	// assert the next line of the output contains the prompt string and its value
-	assert.Equal(t, fmt.Sprintf("%s%v", PROMPT, INPUT), io.ReadLine())
+	// read multiple lines (returns slice)
+	lines := out.ReadLines(2)
+
+To read a line, but ignore it's value, use SkipLines.
+
+	// skip the following lines
+	out.SkipLines(2)
 */
 package pipe

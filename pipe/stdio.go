@@ -23,6 +23,7 @@ type StdioPipe struct {
 
 // Open the Stdio pipe with the requested buffer sizes.
 // After calling, stdin/stdout will read/write to the pipe until Close is called.
+// Do to the redirecting of stdin and stdout, usage of the StdioPipe is NOT thread safe.
 //
 // Note the process will stall if either buffer is too small to store the required values, so
 // ensure a large enough buffer size to accommodate all expected data.
