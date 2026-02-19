@@ -1,4 +1,4 @@
 /*
-The file package provides helpers for create temporary files in automated test cases.
+The file package provides helpers for creating temporary files in automated test cases.
 */
 package file
