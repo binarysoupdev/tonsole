@@ -21,7 +21,7 @@ func TestStdioPipeInputAndOutput(t *testing.T) {
 	io := pipe.OpenStdio(1, 3, false)
 	defer io.Close()
 
-	io.SubmitFinal(INPUT)
+	io.QueueFinal(INPUT)
 
 	//-- act
 	fmt.Println(PRE_INPUT)
@@ -47,7 +47,7 @@ func TestStdioPipeWithEcho(t *testing.T) {
 	io := pipe.OpenStdio(1, 1, true)
 	defer io.Close()
 
-	io.SubmitFinal(INPUT)
+	io.QueueFinal(INPUT)
 
 	//-- act
 	fmt.Print(INPUT.Prompt)

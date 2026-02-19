@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// StdioPipe is a testing utility for inputting stdin and reading stdout in automated test cases.
 type StdioPipe struct {
 	stdin  *os.File
 	stdout *os.File
@@ -20,7 +21,16 @@ type StdioPipe struct {
 	echo bool
 }
 
-func OpenStdio(inputBuf, outputBuf int, echo bool) StdioPipe {
+// Open the Stdio pipe with the requested buffer sizes.
+// After calling, stdin/stdout will read/write to the pipe until Close is called.
+//
+// Note the process will stall if either buffer is too small to store the required values, so
+// ensure a large enough buffer size to accommodate all expected data.
+// If either buffer size is zero, then that buffer is effectively disabled (see OpenStdin/OpenStdout).
+//
+// Echoing involves copying input to the output buffer to mimic terminal echoing.
+// Does nothing if either buffer is disabled.
+func OpenStdio(inBufSize, outBufSize int, enableEcho bool) StdioPipe {
 	p := StdioPipe{
 		stdin:       os.Stdin,
 		stdout:      os.Stdout,
@@ -29,23 +39,24 @@ func OpenStdio(inputBuf, outputBuf int, echo bool) StdioPipe {
 		outBuffer:   nil,
 		inputClosed: make(chan struct{}, 1),
 		close:       make(chan struct{}, 1),
-		echo:        echo,
+		echo:        enableEcho,
 	}
 
-	if inputBuf > 0 {
+	if inBufSize > 0 {
 		os.Stdin, p.input, _ = os.Pipe()
-		p.inBuffer = make(chan InputPair, inputBuf)
+		p.inBuffer = make(chan InputPair, inBufSize)
 	}
 
 	p.output, os.Stdout, _ = os.Pipe()
-	if outputBuf > 0 {
-		p.outBuffer = make(chan string, outputBuf)
+	if outBufSize > 0 {
+		p.outBuffer = make(chan string, outBufSize)
 	}
 
 	go p.run()
 	return p
 }
 
+// Close the pipe and restore stdin/stdout.
 func (p StdioPipe) Close() {
 	if p.input != nil {
 		os.Stdin.Close()

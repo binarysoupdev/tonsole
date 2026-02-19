@@ -25,7 +25,7 @@ func TestStdinPipeSubmitOnce(t *testing.T) {
 	defer in.Close()
 
 	//-- act
-	in.Submit(INPUT...)
+	in.Queue(INPUT...)
 
 	for _, input := range INPUT {
 		fmt.Print(input.Prompt)
@@ -46,7 +46,7 @@ func TestStdinPipeSubmitMany(t *testing.T) {
 
 	for _, input := range INPUT {
 		//-- act
-		in.Submit(input)
+		in.Queue(input)
 
 		fmt.Print(input.Prompt)
 		res := readStdin()
@@ -64,7 +64,7 @@ func TestStdinPipeReadPrompt(t *testing.T) {
 	in := pipe.OpenStdin(1)
 	defer in.Close()
 
-	in.Submit(INPUT, INPUT)
+	in.Queue(INPUT, INPUT)
 
 	//-- act
 	fmt.Print("---prompt")
